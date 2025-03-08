@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
@@ -6,6 +8,7 @@ import 'package:todolistapp/ui/view/screens/add_todo_sheet.dart';
 import 'package:todolistapp/ui/view/system_design/app_colors.dart';
 import 'package:todolistapp/ui/view/system_design/app_images.dart';
 import 'package:todolistapp/ui/view/system_design/app_typography.dart';
+import 'package:todolistapp/ui/view/system_design/screen_size.dart';
 
 import '../../../data/models/todo_model.dart';
 
@@ -179,43 +182,61 @@ class _HomeScreenState extends State<HomeScreen> {
               ));
         },
       ),
-      floatingActionButton: Container(
-        width: 42,
-        height: 42,
-        decoration: BoxDecoration(
-            color: AppColors.blackColor,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                  color: AppColors.blackColor.withOpacity(0.14),
-                  offset: Offset(0, 4),
-                  blurRadius: 8,
-                  spreadRadius: 0)
-            ]),
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              CupertinoBottomSheetRoute(
-                args: const CupertinoBottomSheetRouteArgs(
-                  swipeSettings: SwipeSettings(
-                    canCloseBySwipe: true,
-                  ),
-                ),
-                builder: (context) {
-                  return AddTodoSheet();
-                },
+      floatingActionButton: (Platform.isAndroid)
+          ? FloatingActionButton(
+              backgroundColor: AppColors.blackColor,
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (context) {
+                    return SizedBox(
+                        height: context.height * 0.8, child: AddTodoSheet());
+                  },
+                );
+              },
+              child: Icon(
+                Icons.add,
+                color: AppColors.whiteColor,
               ),
-            );
-          },
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: Icon(
-            Icons.add,
-            color: AppColors.whiteColor,
-            size: 35,
-          ),
-        ),
-      ),
+            )
+          : Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                  color: AppColors.blackColor,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                        color: AppColors.blackColor.withOpacity(0.14),
+                        offset: Offset(0, 4),
+                        blurRadius: 8,
+                        spreadRadius: 0)
+                  ]),
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    CupertinoBottomSheetRoute(
+                      args: const CupertinoBottomSheetRouteArgs(
+                        swipeSettings: SwipeSettings(
+                          canCloseBySwipe: true,
+                        ),
+                      ),
+                      builder: (context) {
+                        return AddTodoSheet();
+                      },
+                    ),
+                  );
+                },
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                child: Icon(
+                  Icons.add,
+                  color: AppColors.whiteColor,
+                  size: 35,
+                ),
+              ),
+            ),
     );
   }
 }

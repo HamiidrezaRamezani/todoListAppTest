@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
@@ -16,17 +18,28 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => TodoCubit(TodoRepository())..loadTodos(),
-      child: CupertinoBottomSheetRepaintBoundary(
-        child: MaterialApp(
-          title: 'ToDoList App',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            useMaterial3: true,
-          ),
-          home: HomeScreen(),
-        ),
-      ),
+      child: (Platform.isAndroid)
+          ? MaterialApp(
+              title: 'ToDoList App',
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+                useMaterial3: true,
+              ),
+              home: HomeScreen(),
+            )
+          : CupertinoBottomSheetRepaintBoundary(
+              child: MaterialApp(
+                title: 'ToDoList App',
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData(
+                  colorScheme:
+                      ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+                  useMaterial3: true,
+                ),
+                home: HomeScreen(),
+              ),
+            ),
     );
   }
 }

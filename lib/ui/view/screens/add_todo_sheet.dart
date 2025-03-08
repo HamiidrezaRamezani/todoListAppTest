@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:animated_slide_switcher/animated_slide_switcher.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,21 +20,21 @@ class _AddTodoSheetState extends State<AddTodoSheet> {
 
   TimeOfDay selectedTime = TimeOfDay.now();
 
-  // String _selectedTime = "انتخاب ساعت";
+  String _selectedTime = "Select Time";
   String timeZone = "AM";
   bool _isToday = false;
 
-  // Future<void> _pickTime() async {
-  //   final TimeOfDay? pickedTime = await showTimePicker(
-  //     context: context,
-  //     initialTime: TimeOfDay.now(),
-  //   );
-  //   if (pickedTime != null) {
-  //     setState(() {
-  //       _selectedTime = pickedTime.format(context);
-  //     });
-  //   }
-  // }
+  Future<void> _pickTime() async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (pickedTime != null) {
+      setState(() {
+        _selectedTime = pickedTime.format(context);
+      });
+    }
+  }
 
   void _addTask() {
     if (_titleController.text.isEmpty) return;
@@ -72,25 +74,33 @@ class _AddTodoSheetState extends State<AddTodoSheet> {
                     onTap: () {
                       Navigator.pop(context);
                     },
-                    child: Container(
-                      height: 42.0,
-                      width: 78,
-                      margin: EdgeInsets.only(left: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.arrow_back_ios,
-                            color: AppColors.blueColor,
-                          ),
-                          Text(
-                            "Close",
-                            style: AppTypography.regularTextView(
-                                18.0, AppColors.blueColor),
+                    child: (Platform.isAndroid)
+                        ? Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: Icon(
+                              Icons.close,
+                              color: AppColors.blueColor,
+                            ),
                           )
-                        ],
-                      ),
-                    ),
+                        : Container(
+                            height: 42.0,
+                            width: 78,
+                            margin: EdgeInsets.only(left: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.arrow_back_ios,
+                                  color: AppColors.blueColor,
+                                ),
+                                Text(
+                                  "Close",
+                                  style: AppTypography.regularTextView(
+                                      18.0, AppColors.blueColor),
+                                )
+                              ],
+                            ),
+                          ),
                   )),
               Align(
                 alignment: Alignment.bottomCenter,
@@ -156,16 +166,6 @@ class _AddTodoSheetState extends State<AddTodoSheet> {
                 ],
               ),
               SizedBox(height: 30),
-              // GestureDetector(
-              //   onTap: _pickTime,
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     children: [
-              //       Text(_selectedTime, style: TextStyle(fontSize: 16)),
-              //       Icon(Icons.access_time, color: Colors.blue),
-              //     ],
-              //   ),
-              // ),
               Row(
                 children: [
                   Text(
@@ -176,88 +176,121 @@ class _AddTodoSheetState extends State<AddTodoSheet> {
                   SizedBox(
                     width: 16.0,
                   ),
-                  Row(
-                    children: [
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          SizedBox(
-                            width: 110.0,
+                  (Platform.isAndroid)
+                      ? GestureDetector(
+                          onTap: _pickTime,
+                          child: Container(
                             height: 42.0,
-                            child: ClipRect(
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: SizedBox(
+                            decoration: BoxDecoration(
+                                color: AppColors.blueColor,
+                                borderRadius: BorderRadius.circular(8.0)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(_selectedTime,
+                                      style: AppTypography.mediumTextView(
+                                          16.0, AppColors.whiteColor, false)),
+                                  SizedBox(
+                                    width: 8.0,
+                                  ),
+                                  Icon(Icons.access_time,
+                                      color: AppColors.whiteColor),
+                                ],
+                              ),
+                            ),
+                          ))
+                      : Row(
+                          children: [
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 110.0,
                                   height: 42.0,
-                                  child: CupertinoDatePicker(
-                                    mode: CupertinoDatePickerMode.time,
-                                    initialDateTime: DateTime(2022, 1, 1,
-                                        selectedTime.hour, selectedTime.minute),
-                                    use24hFormat: true,
-                                    onDateTimeChanged: (DateTime newTime) {
-                                      setState(() {
-                                        selectedTime = TimeOfDay(
-                                            hour: newTime.hour,
-                                            minute: newTime.minute);
-                                      });
-                                      if (newTime.hour > 12) {
-                                        setState(() {
-                                          timeZone = "PM";
-                                        });
-                                      } else if (newTime.hour < 12) {
-                                        setState(() {
-                                          timeZone = "AM";
-                                        });
-                                      }
-                                    },
+                                  child: ClipRect(
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: SizedBox(
+                                        height: 42.0,
+                                        child: CupertinoDatePicker(
+                                          mode: CupertinoDatePickerMode.time,
+                                          initialDateTime: DateTime(
+                                              2022,
+                                              1,
+                                              1,
+                                              selectedTime.hour,
+                                              selectedTime.minute),
+                                          use24hFormat: true,
+                                          onDateTimeChanged:
+                                              (DateTime newTime) {
+                                            setState(() {
+                                              selectedTime = TimeOfDay(
+                                                  hour: newTime.hour,
+                                                  minute: newTime.minute);
+                                            });
+                                            if (newTime.hour > 12) {
+                                              setState(() {
+                                                timeZone = "PM";
+                                              });
+                                            } else if (newTime.hour < 12) {
+                                              setState(() {
+                                                timeZone = "AM";
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  child: Text(
+                                    ":",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              height: 38.0,
+                              width: 62.0,
+                              decoration: BoxDecoration(
+                                  color: Color(0xFF767680).withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(9.0)),
+                              child: Center(
+                                child: Container(
+                                  height: 30.0,
+                                  width: 54.0,
+                                  decoration: BoxDecoration(
+                                      color: AppColors.whiteColor,
+                                      borderRadius: BorderRadius.circular(9.0)),
+                                  child: Center(
+                                    child: AnimatedSlideSwitcher<String>(
+                                      value: timeZone,
+                                      builder: (context, value) => Text(
+                                        value,
+                                        style: AppTypography.boldTextView(
+                                            16.0, AppColors.blackColor),
+                                      ),
+                                      direction: AnimationDirection.upToDown,
+                                      incomingDuration:
+                                          Duration(milliseconds: 500),
+                                      outgoingDuration:
+                                          Duration(milliseconds: 150),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
-                          Positioned(
-                            child: Text(
-                              ":",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        height: 38.0,
-                        width: 62.0,
-                        decoration: BoxDecoration(
-                            color: Color(0xFF767680).withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(9.0)),
-                        child: Center(
-                          child: Container(
-                            height: 30.0,
-                            width: 54.0,
-                            decoration: BoxDecoration(
-                                color: AppColors.whiteColor,
-                                borderRadius: BorderRadius.circular(9.0)),
-                            child: Center(
-                              child: AnimatedSlideSwitcher<String>(
-                                value: timeZone,
-                                builder: (context, value) => Text(
-                                  value,
-                                  style: AppTypography.boldTextView(
-                                      16.0, AppColors.blackColor),
-                                ),
-                                direction: AnimationDirection.upToDown,
-                                incomingDuration: Duration(milliseconds: 500),
-                                outgoingDuration: Duration(milliseconds: 150),
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  )
+                            )
+                          ],
+                        )
                 ],
               ),
               SizedBox(height: 30),
@@ -267,19 +300,20 @@ class _AddTodoSheetState extends State<AddTodoSheet> {
                   Text("Today",
                       style: AppTypography.boldTextView(
                           20.0, AppColors.blackColor)),
-                  // Switch(
-                  //   value: _isToday,
-                  //   onChanged: (value) {
-                  //     setState(() {
-                  //       _isToday = value;
-                  //     });
-                  //   },
-                  // ),
-                  CupertinoSwitch(
-                    activeColor: AppColors.greenColor,
-                    value: _isToday,
-                    onChanged: (v) => setState(() => _isToday = v),
-                  ),
+                  (Platform.isAndroid)
+                      ? Switch(
+                          value: _isToday,
+                          onChanged: (value) {
+                            setState(() {
+                              _isToday = value;
+                            });
+                          },
+                        )
+                      : CupertinoSwitch(
+                          activeColor: AppColors.greenColor,
+                          value: _isToday,
+                          onChanged: (v) => setState(() => _isToday = v),
+                        ),
                 ],
               ),
               SizedBox(height: 62),
